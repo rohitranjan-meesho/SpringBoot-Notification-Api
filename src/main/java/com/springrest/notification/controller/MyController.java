@@ -1,8 +1,11 @@
 package com.springrest.notification.controller;
 
+import com.springrest.notification.dto.SearchRequestDTO;
+import com.springrest.notification.dto.SmsRequestInput;
 import com.springrest.notification.entity.Phone;
 import com.springrest.notification.entity.Sms;
 import com.springrest.notification.exception.GlobalExceptionHandler;
+import com.springrest.notification.services.SearchService;
 import com.springrest.notification.services.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +27,10 @@ public class MyController {
     private static final String message_template = "message : %s";
 
     @Autowired
-    private SmsService service;
+    private SmsService smsService;
+
+    @Autowired
+    private SearchService searchService;
 
 
 
@@ -39,21 +45,13 @@ public class MyController {
 //    }
 
     @PostMapping("/sms/send")
-    public ResponseEntity<?> addRequest(@Valid @RequestBody Map<String,String> map) throws MethodArgumentNotValidException {
+    public ResponseEntity<?> addRequest(@Valid @RequestBody SmsRequestInput input) throws MethodArgumentNotValidException {
         //add request in db
-        System.out.println(map.get("phone_number"));
-        Sms temp=Sms.builder()
-                .phone_number(map.get("phone_number"))
-                .message(map.get("message"))
-                .status("IN_PROGRESS")
-//                .failure_code(0)
-//                .failure_comments("none")
 
-                //.failure_comments(null)
-                .build();
+
         try{
-            this.service.addSms(temp);
-            return ResponseEntity.of(Optional.of(temp));
+            Sms ret=smsService.addSms(input);
+            return ResponseEntity.of(Optional.of(ret));
         }
         catch(Exception e)
         {
@@ -73,7 +71,7 @@ public class MyController {
     @PostMapping("/blacklist")
     public ResponseEntity<String> blacklist(@RequestBody Phone phone)
     {
-        boolean result = this.service.block(phone);
+        boolean result = this.smsService.block(phone);
         if (result)
         {
             return ResponseEntity.ok("Phone number blacklisted successfully!");
@@ -86,7 +84,28 @@ public class MyController {
     @GetMapping("/blacklist")
     public ResponseEntity<List<Phone>> getAllBlocked()
     {
-        List<Phone> blocked_numbers=this.service.findAll();
+        List<Phone> blocked_numbers=this.smsService.findAll();
         return ResponseEntity.ok(blocked_numbers);
     }
+
+    @DeleteMapping(path="/unblock/{phone}")
+    public ResponseEntity<String> unblock(@PathVariable(value="phone") Phone phone)
+    {
+        boolean result=this.smsService.unblock(phone);
+        if(result)
+        {
+            return ResponseEntity.ok("Phone number unblocked successfully!");
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+    }
+
+    @GetMapping(path="/search")
+    public List<Sms> search(@RequestBody SearchRequestDTO searchRequest)
+    {
+        return this.searchService.search(searchRequest);
+    }
+
 }

@@ -1,10 +1,14 @@
 package com.springrest.notification.entity;
 
+import com.springrest.notification.helper.Indices;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
@@ -16,6 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Builder
+@Document(indexName = Indices.SMS_INDEX)
 @Table(
         name="sms_table",
         uniqueConstraints = @UniqueConstraint(
@@ -39,9 +44,12 @@ public class Sms {
     private int id;
 
 
-    @Pattern(regexp="^[+]?[0-9]{0,2}?[0-9]{10}$",message="Invalid Phone Number!")
+    //@Pattern(regexp="^[+]?[0-9]{0,2}?[0-9]{10}$",message="Invalid Phone Number!")
     private String phone_number;
+
+    //@Field(type= FieldType.Text)
     private String message;
+
     private String status;
 
     //@Column(columnDefinition = "int")

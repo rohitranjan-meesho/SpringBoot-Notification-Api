@@ -1,0 +1,30 @@
+{
+  "properties" : {
+    "id": {
+      "type": "keyword"
+    },
+    "phone_number": {
+      "type": "text"
+    },
+    "message": {
+      "type": "text"
+    },
+    "failure_code": {
+      "type": "keyword"
+    },
+    "failure_comments": {
+      "type": "text"
+    },
+    "status" : {
+      "type" : "text"
+    },
+    "created_at" : {
+      "type" : "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "updated_at" : {
+      "type" : "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  }
+}

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+//redis repository
 @Repository
 public class PhoneDao {
     public static final String HASH_KEY="Phone";
@@ -24,6 +25,18 @@ public class PhoneDao {
             return false;
         }
 
+    }
+    public boolean delete(Phone phone)
+    {
+        try{
+            template.delete(phone);
+            return true;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
     public List<Phone> findAll()
     {
