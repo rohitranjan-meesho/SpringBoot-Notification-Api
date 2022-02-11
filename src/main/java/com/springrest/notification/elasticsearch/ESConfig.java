@@ -1,5 +1,7 @@
 package com.springrest.notification.elasticsearch;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,10 +23,12 @@ public class ESConfig extends AbstractElasticsearchConfiguration {
     @Bean
     @Override
     public RestHighLevelClient elasticsearchClient() {
-        final ClientConfiguration config = ClientConfiguration.builder()
-                .connectedTo(elasticsearchUrl)
-                .build();
-
-        return RestClients.create(config).rest();
+            RestHighLevelClient client = new RestHighLevelClient(
+                    RestClient.builder(
+                            new HttpHost("localhost", 9200, "http"),
+                            new HttpHost("localhost", 9201, "http"))
+            );
+            return client;
+        }
     }
-}
+

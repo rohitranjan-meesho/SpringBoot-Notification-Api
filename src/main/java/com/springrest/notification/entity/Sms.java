@@ -20,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Builder
-@Document(indexName = Indices.SMS_INDEX)
+//@Document(indexName = Indices.SMS_INDEX)
 @Table(
         name="sms_table",
         uniqueConstraints = @UniqueConstraint(

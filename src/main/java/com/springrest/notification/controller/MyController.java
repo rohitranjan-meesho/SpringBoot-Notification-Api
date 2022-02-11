@@ -4,9 +4,11 @@ import com.springrest.notification.dto.SearchRequestDTO;
 import com.springrest.notification.dto.SmsRequestInput;
 import com.springrest.notification.entity.Phone;
 import com.springrest.notification.entity.Sms;
-import com.springrest.notification.exception.GlobalExceptionHandler;
+import com.springrest.notification.entity.SmsES;
+
 import com.springrest.notification.services.SearchService;
 import com.springrest.notification.services.SmsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +16,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
+
 import java.util.*;
-import java.util.function.*;
+
 
 @RestController
 public class MyController {
@@ -56,15 +56,9 @@ public class MyController {
         catch(Exception e)
         {
 
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST).build();
-
-
-           //return new ResponseEntity<Sms>(HttpStatus.BAD_REQUEST);
             return new ResponseEntity<>("{'description': '" + e.getMessage() + "'}", HttpStatus.BAD_REQUEST);
         }
 
-        //return this.service.addSms(temp);
 
     }
 
@@ -103,9 +97,15 @@ public class MyController {
     }
 
     @GetMapping(path="/search")
-    public List<Sms> search(@RequestBody SearchRequestDTO searchRequest)
+    public List<SmsES> search(@RequestBody SearchRequestDTO searchRequest)
     {
         return this.searchService.search(searchRequest);
+    }
+
+    @GetMapping(path="/search/all")
+    public List<SmsES> searchAll()
+    {
+        return this.searchService.findAll();
     }
 
 }

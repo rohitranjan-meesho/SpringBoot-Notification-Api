@@ -2,14 +2,16 @@ package com.springrest.notification.services;
 
 import com.springrest.notification.dao.SmsDao;
 import com.springrest.notification.dto.SendSmsKafkaRequest;
+
 import com.springrest.notification.dto.ThirdPartyDTO;
 import com.springrest.notification.entity.Sms;
+import com.springrest.notification.entity.SmsES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Optional;
+
 
 @Service
 public class KafkaConsumer {
@@ -37,7 +39,7 @@ public class KafkaConsumer {
 
 
 
-//   ********************    3rd Party Api call           *******************
+   //********************    3rd Party Api call           *******************
 
 
         ThirdPartyDTO apiResponse = thirdPartyService.callThirdParty(temp);
@@ -59,7 +61,23 @@ public class KafkaConsumer {
 
         //save request updates
         smsDao.save(temp);
-        searchService.index(temp);
+        SmsES temp_es= SmsES.builder()
+                        .id(temp.getId())
+                                .phone_number(temp.getPhone_number())
+                                        .status(temp.getStatus())
+                                                .message(temp.getMessage())
+                                                        .failure_code(temp.getFailure_code())
+                                                                .failure_comments(temp.getFailure_comments())
+                                                                        .created_at(temp.getCreated_at())
+                                                                                .updated_at(temp.getUpdated_at())
+                                                                                        .request_UUID(temp.getRequest_UUID())
+                                                                                                .build();
+
+
+
+
+
+        searchService.index(temp_es);
 
 
     }

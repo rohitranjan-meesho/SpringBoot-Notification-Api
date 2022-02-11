@@ -26,8 +26,7 @@ public class ThirdPartyService {
     private final String apiUrl = "https://api.imiconnect.in/resources/v1/messaging";
     private final Logger logger = LoggerFactory.getLogger(ThirdPartyService.class);
     private final String contentType = "application/json";
-    //private final String key="xxxxxxxxxxxxxxxxxxx"
-    
+    private final String key="xxxxxxxxxxxxxxxxxxx";
 
 
     @Autowired

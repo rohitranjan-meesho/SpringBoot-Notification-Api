@@ -1,6 +1,7 @@
 package com.springrest.notification.services;
 import com.springrest.notification.dto.SearchRequestDTO;
-import com.springrest.notification.entity.Sms;
+import com.springrest.notification.elasticsearch.ESDao;
+import com.springrest.notification.entity.SmsES;
 import com.springrest.notification.helper.Indices;
 import com.springrest.notification.helper.SearchUtil;
 import org.elasticsearch.action.index.IndexRequest;
@@ -32,20 +33,24 @@ public class SearchService {
     private final RestHighLevelClient client;
 
     @Autowired
+    private ESDao esDao;
+
+    @Autowired
     public SearchService(RestHighLevelClient client) {
         this.client = client;
     }
 
-    public Boolean index(final Sms sms){
+    public Boolean index(final SmsES sms){
         try{
             final String smsAsString = MAPPER.writeValueAsString(sms);
 
-            final IndexRequest request = new IndexRequest("sms_service");
+            final IndexRequest request = new IndexRequest(Indices.SMS_INDEX);
             request.id(String.valueOf(sms.getId()));
             request.source(smsAsString, XContentType.JSON);
 
             final IndexResponse response = client.index(request, RequestOptions.DEFAULT);
 
+            System.out.println("Index successfull! ES");
             return response != null && response.status().equals(RestStatus.OK);
 
         }catch (final Exception e)
@@ -55,7 +60,7 @@ public class SearchService {
         }
     }
 
-    public List<Sms> search(final SearchRequestDTO dto) {
+    public List<SmsES> search(final SearchRequestDTO dto) {
         SearchRequest request;
         if (dto.getStartDate() == "2022-01-01 00:00:00" && dto.getEndDate() == "2023-01-01 00:00:00") {
             LOG.info("Built MatchQuery");
@@ -71,7 +76,7 @@ public class SearchService {
         return searchInternal(request);
     }
 
-    private List<Sms> searchInternal(SearchRequest request) {
+    private List<SmsES> searchInternal(SearchRequest request) {
         if(request == null) {
             LOG.error("Failed to build search Request");
             return Collections.emptyList();
@@ -79,11 +84,11 @@ public class SearchService {
         try{
             final SearchResponse response = client.search(request, RequestOptions.DEFAULT);
             final SearchHit[] searchHits = response.getHits().getHits();
-            final List<Sms> smsList = new ArrayList<>(searchHits.length);
+            final List<SmsES> smsList = new ArrayList<>(searchHits.length);
 
             for(SearchHit hit : searchHits)
             {
-                smsList.add(MAPPER.readValue(hit.getSourceAsString(), Sms.class));
+                smsList.add(MAPPER.readValue(hit.getSourceAsString(), SmsES.class));
             }
             return smsList;
         }catch (Exception e)
@@ -91,5 +96,13 @@ public class SearchService {
             LOG.error(e.getMessage(),e);
             return Collections.emptyList();
         }
+    }
+
+    public List<SmsES> findAll() {
+        List<SmsES> list=new ArrayList<>();
+        Iterable<SmsES> iter=esDao.findAll();
+        iter.forEach(list::add);
+        return list;
+
     }
 }
